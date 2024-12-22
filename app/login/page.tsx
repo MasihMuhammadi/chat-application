@@ -11,7 +11,7 @@ import Link from "next/link";
 const Login = () => {
   // Validation schema using Yup
   const { user, setUser, setExistUser }: any = useUserContext();
-  const baseUrl = "http://localhost:5000";
+  const baseUrl = "https://chat-backend-1096.onrender.com";
   const validationSchema = Yup.object({
     email: Yup.string()
       .email("Invalid email address")

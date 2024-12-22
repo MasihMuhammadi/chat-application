@@ -19,7 +19,7 @@ const FriendsPage = () => {
   const [matchedUsers, setMatchedUsers] = useState<any>(null);
   const [isSended, setIsSended] = useState<boolean>(false);
   const { user, setUser }: any = useUserContext();
-  const baseUrl = "http://localhost:5000";
+  const baseUrl = "https://chat-backend-1096.onrender.com";
 
   // Reference to the chat container for scrolling
   const messagesEndRef = useRef<HTMLDivElement | null>(null);

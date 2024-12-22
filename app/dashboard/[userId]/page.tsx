@@ -12,7 +12,7 @@ const UserDashboard = () => {
   const username = searchParams.get("username"); // Get username from query params
   const { user, setUser }: any = useUserContext();
 
-  const baseUrl = "http://localhost:5000";
+  const baseUrl = "https://chat-backend-1096.onrender.com";
   const [friends, setFriends] = useState([]);
   const [searchInput, setSearchInput] = useState("");
   const [searchResult, setSearchResult] = useState([]);
