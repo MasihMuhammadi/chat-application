@@ -4,7 +4,7 @@ import axios from "axios";
 
 export async function middleware(request: NextRequest) {
   const cookie = request.cookies.get("userId");
-  const baseUrl = "https://chat-backend-1096.onrender.com";
+  const baseUrl = "https://chat-backend-qvhb.onrender.com";
 
   const url = request.nextUrl.clone();
 

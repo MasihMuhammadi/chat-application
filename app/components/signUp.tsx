@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const SignUp = () => {
-  const baseUrl = "https://chat-backend-1096.onrender.com";
+  const baseUrl = "https://chat-backend-qvhb.onrender.com";
 
   const validationSchema = Yup.object({
     email: Yup.string()

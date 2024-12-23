@@ -10,7 +10,7 @@ const UserContext: any = createContext("");
 export const UserProvider = ({ children }: { children: any }) => {
   const [user, setUser] = useState<any>(null);
   const [existUser, setExistUser] = useState(null);
-  const baseUrl = "https://chat-backend-1096.onrender.com";
+  const baseUrl = "https://chat-backend-qvhb.onrender.com";
   useEffect(() => {
     const getUserById = async () => {
       const userCookie = Cookies.get("userId");

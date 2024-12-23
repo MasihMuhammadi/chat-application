@@ -6,7 +6,7 @@ import { useContext, useEffect, useState } from "react";
 
 const RequestsPage = () => {
   const { userId } = useParams(); // Access userId from route
-  const baseUrl = "https://chat-backend-1096.onrender.com";
+  const baseUrl = "https://chat-backend-qvhb.onrender.com";
   const [requests, setRequests] = useState([]);
   const { user, setUser }: any = useUserContext();
 
