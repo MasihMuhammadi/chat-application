@@ -11,7 +11,9 @@ import Link from "next/link";
 const Login = () => {
   // Validation schema using Yup
   const { user, setUser, setExistUser }: any = useUserContext();
-  const baseUrl = "https://chat-backend-qvhb.onrender.com";
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL_TEST;
+  // const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL_TEST;
+
   const validationSchema = Yup.object({
     email: Yup.string()
       .email("Invalid email address")
@@ -35,15 +37,13 @@ const Login = () => {
           `${baseUrl}/api/auth/login`,
           values
         );
-
         if (createAccount.data.success) {
           const userId = createAccount.data.data.user.id;
           setUser(createAccount);
           setExistUser(true);
-          // Store user ID in a cookie
-          Cookies.set("userId", userId, { expires: 7 }); // Cookie will expire in 7 days
 
-          // Redirect to a nested route with the user ID
+          Cookies.set("userId", createAccount.data.data.token, { expires: 7 });
+
           route.push(`/dashboard/${userId}`);
         } else {
           console.log("User does not exist");

@@ -3,6 +3,11 @@
 @tailwind utilities;
 
 /* Allow scrolling and hide the scrollbar in Webkit browsers */
+body {
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji",
+    sans-serif;
+}
+
 .no-scroll {
   overflow: auto; /* Allow scrolling */
 }
@@ -25,4 +30,8 @@
 .no-scroll {
   scrollbar-width: thin; /* Set the width of the scrollbar */
   scrollbar-color: darkblue #f1f1f1; /* scrollbar color and track color */
+}
+
+.emoji-text::after {
+  content: "";
 }

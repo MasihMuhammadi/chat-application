@@ -5,6 +5,7 @@ import axios from "axios";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
 
 const UserDashboard = () => {
   const { userId } = useParams(); // Access userId from route params
@@ -12,7 +13,7 @@ const UserDashboard = () => {
   const username = searchParams.get("username"); // Get username from query params
   const { user, setUser }: any = useUserContext();
 
-  const baseUrl = "https://chat-backend-qvhb.onrender.com";
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL_TEST;
   const [friends, setFriends] = useState([]);
   const [searchInput, setSearchInput] = useState("");
   const [searchResult, setSearchResult] = useState([]);
@@ -20,21 +21,16 @@ const UserDashboard = () => {
   // Fetch user's friends on component mount
   useEffect(() => {
     const getUserData = async () => {
+      const token = user?.data?.data?.token || Cookies.get("userId");
       try {
-        const response = await axios.get(`${baseUrl}/api/user/get/${userId}`, {
+        const response = await axios.get(`${baseUrl}/api/user/get`, {
+          headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });
 
         if (response.status === 200) {
           setUser(response);
-          // Assuming the user data is returned in response.data
           const userData = response.data;
-
-          // You can attach the user data in the response if needed, like setting cookies or headers
-          // const responseWithUser = NextResponse.next();
-          // responseWithUser.headers.set("X-User-Data", JSON.stringify(userData));
-
-          // Redirect logged-in users to their dashboard if accessing login or homepage
         }
       } catch (error) {
         console.error("Error fetching user data in middleware:", error);

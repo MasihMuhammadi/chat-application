@@ -3,21 +3,27 @@ import { useUserContext } from "@/app/context/useAuthContext";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
-
+import Cookies from "js-cookie";
+import { headers } from "next/headers";
+import CheckParams from "@/helper/helper";
 const RequestsPage = () => {
   const { userId } = useParams(); // Access userId from route
-  const baseUrl = "https://chat-backend-qvhb.onrender.com";
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL_TEST;
   const [requests, setRequests] = useState([]);
   const { user, setUser }: any = useUserContext();
+  const token = user?.data?.data?.token || Cookies.get("userId");
 
   const route = useRouter();
   useEffect(() => {
+    CheckParams(userId);
+  }, [userId]);
+  useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const response = await axios.get(
-          `${baseUrl}/api/user/${userId}/requests`,
-          { withCredentials: true }
-        );
+        const response = await axios.get(`${baseUrl}/api/user/requests`, {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        });
 
         setRequests(response.data.friendRequests || []);
       } catch (error) {

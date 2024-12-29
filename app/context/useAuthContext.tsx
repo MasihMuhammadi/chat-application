@@ -10,7 +10,7 @@ const UserContext: any = createContext("");
 export const UserProvider = ({ children }: { children: any }) => {
   const [user, setUser] = useState<any>(null);
   const [existUser, setExistUser] = useState(null);
-  const baseUrl = "https://chat-backend-qvhb.onrender.com";
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL_TEST;
   useEffect(() => {
     const getUserById = async () => {
       const userCookie = Cookies.get("userId");
@@ -21,10 +21,10 @@ export const UserProvider = ({ children }: { children: any }) => {
           if (!userId) throw new Error("User ID not found in cookies");
 
           // Send the userId as a route parameter
-          const response = await axios.get(
-            `${baseUrl}/api/user/get/${userId}`,
-            { withCredentials: true }
-          );
+          const response = await axios.get(`${baseUrl}/api/user/get`, {
+            headers: { Authorization: `Bearer ${userId}` },
+            withCredentials: true,
+          });
         } catch (error: any) {
           console.log("Error fetching user details:", error.message);
         }
