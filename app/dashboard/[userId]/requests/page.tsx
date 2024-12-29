@@ -6,6 +6,7 @@ import { useContext, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { headers } from "next/headers";
 import CheckParams from "@/helper/helper";
+import { FaArrowLeft } from "react-icons/fa";
 const RequestsPage = () => {
   const { userId } = useParams(); // Access userId from route
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL_TEST;
@@ -37,7 +38,7 @@ const RequestsPage = () => {
   }, [userId]);
 
   const acceptRequest = async (requesterId: any) => {
-    const response = await axios.post(`${baseUrl}/api/user/accept-request`, {
+    await axios.post(`${baseUrl}/api/user/accept-request`, {
       userId: userId,
       requesterId: requesterId,
     });
@@ -50,9 +51,9 @@ const RequestsPage = () => {
     <div className="px-4">
       <button
         onClick={handleGoBack}
-        className="bg-white border border-black rounded p-1 mb-4 "
+        className="mx-6 bg-white border border-black rounded p-1 mb-4 "
       >
-        {"<- "}Back
+        <FaArrowLeft />
       </button>
       <h1>
         Your Requests dear <b>{user?.data?.data.username}</b>

@@ -4,11 +4,17 @@ import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import { io } from "socket.io-client";
-import InputEmoji from "react-input-emoji";
 import { useUserContext } from "@/app/context/useAuthContext";
-import Emoji from "react-emoji-render";
 import Cookies from "js-cookie";
 import CheckParams from "@/helper/helper";
+import LetterProfile from "@/app/components/letterProfile";
+import Input from "@/app/components/input";
+import SendFlower from "@/app/components/sendFlower";
+import Messages from "@/app/components/message";
+import { FaArrowLeft, FaBackward } from "react-icons/fa";
+import Skeleton from "react-loading-skeleton";
+
+import ContentLoader from "react-content-loader";
 
 const FriendsPage = () => {
   const route = useRouter();
@@ -22,10 +28,11 @@ const FriendsPage = () => {
   const [onlineUser, setOnlineUser] = useState<any>(null);
   const [offlineUser, setOfflineUser] = useState<any>(null);
   const [matchedUsers, setMatchedUsers] = useState<any>(null);
-  const [isSended, setIsSended] = useState<boolean>(false);
   const { user, setUser }: any = useUserContext();
   const [bgColor, setBgColor] = useState("");
   const token = user?.data?.data?.token || Cookies.get("userId");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [friendsLoading, setFriendsLoading] = useState<boolean>(false);
 
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL_TEST;
 
@@ -59,6 +66,7 @@ const FriendsPage = () => {
   useEffect(() => {
     if (!onlineUser || onlineUser.length === 0) return;
     const getOnlineUsersData = async () => {
+      setFriendsLoading(true);
       try {
         const response = await axios.get(`${baseUrl}/api/user/friends`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -81,6 +89,7 @@ const FriendsPage = () => {
               user._id !== userId // filter out yourself
           );
           setOfflineUser(offlines);
+          setFriendsLoading(false);
         } else {
           console.log("Data is not an array:", response?.data?.friends);
         }
@@ -116,10 +125,9 @@ const FriendsPage = () => {
         { withCredentials: true }
       );
 
-      // Process each message and add a flag to identify if the message is sent or received
       const updatedMessages = response.data.map((message: any) => ({
         ...message,
-        isSent: message.sender === userId, // true for sent messages, false for received ones
+        isSent: message.sender === userId,
       }));
 
       setMessages(updatedMessages);
@@ -138,7 +146,6 @@ const FriendsPage = () => {
     return () => socket.off("getMessage");
   }, [socket]);
 
-  // Scroll to bottom whenever messages are updated or a friend is selected
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -155,15 +162,13 @@ const FriendsPage = () => {
     };
 
     try {
-      // Send message via backend
+      setIsLoading(true);
       await axios.post(`${baseUrl}/api/messages/send`, message);
-
-      // Emit the message to the socket server
       socket.emit("sendMessage", message);
 
-      // Update local state for instant feedback
       setMessages((prev) => [...prev, { ...message, isSent: true }]);
-      setNewMessage(""); // Clear the input after sending
+      setNewMessage("");
+      setIsLoading(false);
     } catch (error) {
       console.log("Error sending message:", error);
     }
@@ -183,10 +188,9 @@ const FriendsPage = () => {
     const flowerMessage = {
       senderId: userId,
       receiverId: selectedFriend,
-      text: "🌸", // The flower emoji as the message text
+      text: "🌸",
     };
 
-    // Send the flower emoji message to the backend
     axios
       .post(`${baseUrl}/api/messages/send`, flowerMessage)
       .then(() => {
@@ -199,7 +203,6 @@ const FriendsPage = () => {
   };
 
   useEffect(() => {
-    // Function to generate a random background color
     const randomColor = () => {
       const colors = [
         "bg-red-500",
@@ -219,179 +222,148 @@ const FriendsPage = () => {
 
   return (
     <div>
-      {/* <button
+      <button
         onClick={handleGoBack}
         className="mx-6 bg-white border border-black rounded p-1 mb-4 "
       >
-        {"<- "}Back
-      </button> */}
+        <FaArrowLeft />
+      </button>
       <div className="flex sm:flex-row flex-col">
-        <div className="w-1/4 p-4">
-          <div className="flex flex-col gap-y-5">
-            <div className="flex flex-row bg-[#121622] rounded-xl p-3 md:flex-col gap-2 relative">
-              <div className="w-3 h-3 bg-green-600 text-right rounded-full absolute right-3"></div>
-              <h1 className="text-[13px] text-white text-center mb-3">
-                Online Friends{" "}
-              </h1>
-              {matchedUsers?.length > 0 ? (
-                matchedUsers?.map((u: any) => (
-                  <div key={u._id} className="flex items-center  mb-4 gap-x-2">
-                    <p
-                      className={`w-8 h-8 text-center text-xl capitalize ${bgColor} text-white rounded-full`}
-                    >
-                      {u.username[0]}
-                    </p>
-                    <div
-                      className={`cursor-pointer  ${
-                        selectedFriend === u._id
-                          ? "text-blue-500"
-                          : "text-white"
-                      }`}
-                      onClick={() => {
-                        setSelectedFriend(u._id);
-                        fetchMessages(u._id);
-                      }}
-                    >
-                      {u.username}
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-white px-4">nobody is online</p>
-              )}
-            </div>
+        {friendsLoading ? (
+          <div className="">
+            <ContentLoader
+              speed={2}
+              width={400}
+              height={160}
+              viewBox="0 0 400 160"
+              backgroundColor="#121622"
+              foregroundColor="#ecebeb"
+            >
+              <div>
+                <rect
+                  x="48"
+                  y="8"
+                  rx="3"
+                  ry="3"
+                  width="88"
+                  height="20"
+                  className="bg-[#121622]"
+                />
+              </div>
+              <div>
+                <rect x="48" y="26" rx="3" ry="3" width="52" height="20" />
+              </div>
 
-            <div className="bg-[#121622] rounded-xl p-3 text-white">
-              <div className="w-3 h-3 bg-red-600 float-end rounded-full"></div>
-              <h1 className="text-[13px] text-white text-center mb-3">
-                Offline Friends{" "}
-              </h1>
-              <div className="">
-                {offlineUser?.length > 0 ? (
-                  offlineUser?.map((friend: any) => (
+              {/* <circle cx="20" cy="20" r="20" /> */}
+            </ContentLoader>
+          </div>
+        ) : (
+          <div className="w-full sm:w-1/4 p-4">
+            <div className="flex flex-col gap-y-5">
+              <div className="flex sm:flex-row bg-[#121622] rounded-xl p-3 md:flex-col gap-2 relative">
+                <div className="w-3 h-3 bg-green-600 text-right rounded-full absolute right-3"></div>
+                <h1 className="text-[13px] hidden md:flex text-white text-center mb-3">
+                  Online Friends{" "}
+                </h1>
+                {matchedUsers?.length > 0 ? (
+                  matchedUsers?.map((u: any) => (
                     <div
-                      key={friend._id}
-                      className="flex items-center  mb-3  gap-x-2"
+                      key={u._id}
+                      className="flex items-center  mb-4 gap-x-2"
                     >
-                      <p
-                        className={`w-8 h-8 text-center  text-2xl capitalize ${bgColor} text-white rounded-full`}
-                      >
-                        {friend.username[0]}
-                      </p>
-                      <div
-                        className={`cursor-pointer  ${
-                          selectedFriend === friend._id
-                            ? "text-blue-500"
-                            : "text-white"
-                        }`}
-                        onClick={() => {
-                          setSelectedFriend(friend._id);
-                          fetchMessages(friend._id);
-                        }}
-                      >
-                        {friend.username}
-                      </div>
+                      <LetterProfile
+                        bgColor={bgColor}
+                        username={u.username}
+                        isSelected={selectedFriend === u._id}
+                        userId={u._id}
+                        setSelectedFriend={setSelectedFriend}
+                        fetchMessages={fetchMessages}
+                      />
                     </div>
                   ))
                 ) : (
-                  <>
-                    <p className="text-white px-4">everybody is online</p>
-                    {/* <p className="text-white px-4">every  </p> */}
-                  </>
+                  <p className="text-white px-4">nobody is online</p>
                 )}
+              </div>
+
+              <div className="bg-[#121622] w-full rounded-xl p-3 text-white">
+                <div className="w-3 h-3 bg-red-600   float-end rounded-full"></div>
+                <h1 className="text-[13px] text-white text-center mb-3 hidden md:flex">
+                  Offline Friends{" "}
+                </h1>
+                <div className="">
+                  {offlineUser?.length > 0 ? (
+                    offlineUser?.map((friend: any) => (
+                      <div
+                        key={friend._id}
+                        className="flex  gap-x-2 mt-5 items-center  mb-3 "
+                      >
+                        <LetterProfile
+                          bgColor={bgColor}
+                          username={friend.username}
+                          isSelected={selectedFriend === friend._id}
+                          userId={friend._id}
+                          setSelectedFriend={setSelectedFriend}
+                          fetchMessages={fetchMessages}
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <>
+                      <p className="text-white px-4">everybody is online</p>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-
+        )}
         {/* Chat Section */}
-        <div className="w-auto sm:w-3/4 p-4 no-scroll">
+        <div className="w-auto sm:w-3/4 p-4  scrollable">
           {selectedFriend ? (
             <>
-              <div className="border p-4 h-[600px] rounded-lg overflow-y-auto bg-[#121622] no-scroll relative">
+              <div className="border p-4 h-[500px] rounded-lg overflow-y-auto bg-[#121622]  scrollable ">
                 <div className="bg-[#04143A] py-3 rounded-3xl shadow-2xl backdrop-blur-lg p-6 mx-4 mb-10 px-5">
                   <div className="flex gap-x-2 items-center font-semibold">
-                    <div className="rounded-full capitalize text-lg px-3 py-1 bg-green-500 text-white">
-                      {friends.find((f) => f._id === selectedFriend)
-                        ?.username[0] ||
+                    <LetterProfile
+                      bgColor={bgColor}
+                      username={
+                        friends.find((f) => f._id === selectedFriend)
+                          ?.username ||
                         matchedUsers?.find((u: any) => u._id === selectedFriend)
-                          ?.username[0]}
-                    </div>
-                    <h2 className="text-white">
-                      {friends.find((f) => f._id === selectedFriend)
-                        ?.username ||
-                        matchedUsers?.find((u: any) => u._id === selectedFriend)
-                          ?.username}
-                    </h2>
+                          ?.username
+                      }
+                    />
                   </div>
                 </div>
                 {messages?.length > 0 ? (
                   messages.map((message, index) => (
                     <div key={index} className=" ">
-                      <div
-                        className={` relative z-[1000]${
-                          message.isSent
-                            ? "text-right p-3 rounded-md rounded-tl-3xl bg-[#0031B8] text-white  my-4 ml-auto max-w-[50%] text-wrap break-words overflow-y-auto"
-                            : "text-left p-3 rounded-md  bg-[#1A2133] rounded-tr-3xl text-white my-4  mr-auto max-w-[50%] text-wrap break-words overflow-y-auto"
-                        }`}
-                      >
-                        <div className="absolute right-2 bottom-1 text-[9px]">
-                          {new Date(
-                            message?.createdAt || Date.now()
-                          ).toLocaleTimeString("en-US", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            hour12: true,
-                          })}
-                        </div>
-
-                        {message.text}
-                      </div>
+                      <Messages message={message} />
                     </div>
                   ))
                 ) : (
-                  <>
-                    <p
-                      onClick={handleFlowerClick}
-                      className="text-center text-[80px] mt-32 cursor-pointer"
-                    >
-                      🌸
-                    </p>
-                    <p className="text-center text-white capitalize">
-                      Tap and Send a Hyacinth to{" "}
-                      {friends.find((f) => f._id === selectedFriend)?.username}
-                    </p>
-                  </>
+                  <SendFlower
+                    handleFlowerClick={handleFlowerClick}
+                    username={
+                      friends.find((f) => f._id === selectedFriend)?.username
+                    }
+                  />
                 )}
                 {/* Scroll to bottom */}
                 <div ref={messagesEndRef} />
-                <div className="absolute bottom-1 right-0 w-full max-w-full px-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="flex-grow">
-                      <InputEmoji
-                        height={400}
-                        shouldReturn={false}
-                        shouldConvertEmojiToImage={false}
-                        value={newMessage}
-                        onChange={setNewMessage}
-                        cleanOnEnter
-                        onEnter={handleOnEnter}
-                        placeholder="Type a message"
-                        borderRadius={5}
-                      />
-                    </div>
-                    <button
-                      className="bg-white text-[#04143A] px-4 py-2 rounded-md border border-gray-300"
-                      onClick={sendMessage}
-                    >
-                      Send
-                    </button>
-                  </div>
-                </div>
               </div>
+
+              <Input
+                newMessage={newMessage}
+                setNewMessage={setNewMessage}
+                handleOnEnter={handleOnEnter}
+                sendMessage={sendMessage}
+                isLoading={isLoading}
+              />
             </>
           ) : (
-            <div className="border p-4 h-[600px] rounded-lg overflow-y-auto bg-[#121622] text-center flex items-center justify-center text-3xl text-white">
+            <div className="border p-4 h-[500px] rounded-lg overflow-y-auto bg-[#121622] text-center flex items-center justify-center text-3xl text-white">
               Select a chat
             </div>
           )}

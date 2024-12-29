@@ -1,10 +1,11 @@
-"use formik";
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Notification from "./notification";
 
 const SignUp = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL_TEST;
@@ -23,6 +24,11 @@ const SignUp = () => {
       .oneOf([Yup.ref("password")], "Passwords must match")
       .required("Confirm password is required"),
   });
+  const [notification, setNotification] = useState({
+    isShow: false,
+    content: "",
+    success: false,
+  });
 
   const router = useRouter();
 
@@ -39,12 +45,23 @@ const SignUp = () => {
         const response = await axios.post(`${baseUrl}/api/auth/register`, {
           email: values.email,
           username: values.userName,
-
           password: values.password,
         });
         console.log(response.data.message || "User created successfully");
-        router.push("/login");
+        setNotification({
+          isShow: true,
+          content: response.data.message || "User created successfully",
+          success: true,
+        });
+        setTimeout(() => {
+          router.push("/login");
+        }, 3000);
       } catch (err: any) {
+        setNotification({
+          isShow: true,
+          content: err.response?.data?.error || "Failed to create account",
+          success: false,
+        });
         console.log(err.response?.data?.error || "Failed to create account");
       }
     },
@@ -52,6 +69,9 @@ const SignUp = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <Notification isShow={notification.isShow} success={notification.success}>
+        {notification.content}
+      </Notification>
       <div className="bg-white p-8 shadow-md rounded-md w-full max-w-sm">
         <h1 className="text-2xl font-bold mb-6">Sign Up</h1>
         <form onSubmit={formik.handleSubmit}>

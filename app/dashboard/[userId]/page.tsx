@@ -6,21 +6,20 @@ import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
+import Skeleton from "react-loading-skeleton";
 
 const UserDashboard = () => {
-  const { userId } = useParams(); // Access userId from route params
-  const searchParams = useSearchParams(); // Access query parameters
-  const username = searchParams.get("username"); // Get username from query params
+  const { userId } = useParams();
   const { user, setUser }: any = useUserContext();
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL_TEST;
-  const [friends, setFriends] = useState([]);
   const [searchInput, setSearchInput] = useState("");
   const [searchResult, setSearchResult] = useState([]);
 
   // Fetch user's friends on component mount
   useEffect(() => {
     const getUserData = async () => {
+      setIsLoading(true);
       const token = user?.data?.data?.token || Cookies.get("userId");
       try {
         const response = await axios.get(`${baseUrl}/api/user/get`, {
@@ -30,7 +29,7 @@ const UserDashboard = () => {
 
         if (response.status === 200) {
           setUser(response);
-          const userData = response.data;
+          setIsLoading(false);
         }
       } catch (error) {
         console.error("Error fetching user data in middleware:", error);
@@ -42,11 +41,13 @@ const UserDashboard = () => {
   // Handle user search
   const searchUsers = async () => {
     try {
+      setIsLoading(true);
       const response = await axios.get(
         `${baseUrl}/api/user/search/${searchInput}/${userId}`,
         { withCredentials: true }
       );
       setSearchResult(response.data.data.users || []);
+      setIsLoading(false);
     } catch (error) {
       console.log("Error searching users:", error);
     }
@@ -68,7 +69,11 @@ const UserDashboard = () => {
   return (
     <div>
       <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-4 px-10">
-        <h1>Welcome {user?.data?.data?.username || user?.data?.username}</h1>
+        {isLoading ? (
+          <Skeleton count={10} />
+        ) : (
+          <h1>Welcome {user?.data?.data?.username || user?.data?.username}</h1>
+        )}
         <div className="flex">
           <input
             type="text"

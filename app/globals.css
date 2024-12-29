@@ -8,30 +8,47 @@ body {
     sans-serif;
 }
 
-.no-scroll {
+/* Scrollable with visible and styled scrollbar */
+.scrollable {
   overflow: auto; /* Allow scrolling */
 }
 
 /* Webkit-based browsers (Chrome, Safari) */
-.no-scroll::-webkit-scrollbar {
-  width: 2px; /* Set the width of the scrollbar */
+.scrollable::-webkit-scrollbar {
+  width: 6px; /* Set the width of the scrollbar */
 }
 
-.no-scroll::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, #ff6347, #4b9cd3);
-  border-radius: 10px; /* Optional: rounded corners for the scrollbar thumb */
+.scrollable::-webkit-scrollbar-thumb {
+  background: #121622; /* Gradient color */
+  border-radius: 10px; /* Rounded corners for the scrollbar thumb */
 }
 
-.no-scroll::-webkit-scrollbar-track {
-  background: #f1f1f1; /* Optional: scrollbar track color */
+.scrollable::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Scrollbar track color */
 }
 
 /* Firefox */
-.no-scroll {
-  scrollbar-width: thin; /* Set the width of the scrollbar */
-  scrollbar-color: darkblue #f1f1f1; /* scrollbar color and track color */
+.scrollable {
+  scrollbar-width: thin; /* Thin scrollbar */
+  scrollbar-color: #121622 #f1f1f1; /* Scrollbar thumb and track colors */
 }
 
-.emoji-text::after {
-  content: "";
+/* Hidden scrollbar but still scrollable */
+.hidden-scroll {
+  overflow: auto; /* Enable scrolling */
+}
+
+/* Webkit-based browsers (Chrome, Safari, Edge) */
+.hidden-scroll::-webkit-scrollbar {
+  display: none; /* Completely hide the scrollbar */
+}
+
+/* Firefox */
+.hidden-scroll {
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+/* Fallback for older browsers (Internet Explorer, Edge) */
+.hidden-scroll {
+  -ms-overflow-style: none; /* Hide scrollbar for IE/Edge */
 }
