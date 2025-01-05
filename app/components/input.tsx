@@ -20,9 +20,8 @@ const Input = ({
     <>
       <div className=" px-1">
         <div className="flex items-center gap-x-1">
-          <div className="w-full  min-w-[280px] max-h-[100px] hidden-scroll">
+          <div className="w-full  min-w-[280px] max-h-[100px] ">
             <InputEmoji
-              // height={400}
               shouldReturn={false}
               shouldConvertEmojiToImage={false}
               value={newMessage}
@@ -31,7 +30,6 @@ const Input = ({
               onEnter={handleOnEnter}
               placeholder="Type a message"
               borderRadius={5}
-              height={100}
             />
           </div>
           <button

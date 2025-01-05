@@ -9,6 +9,7 @@ import Cookies from "js-cookie";
 import Notifiaction from "../components/notification";
 import Link from "next/link";
 import Notification from "../components/notification";
+import Mockup from "../components/mockup";
 
 const Login = () => {
   const { user, setUser, setExistUser }: any = useUserContext();
@@ -93,52 +94,61 @@ const Login = () => {
           {notification.content}
         </Notification>
       )}
-      <form
-        className="flex flex-col w-fit gap-5 bg-slate-200 rounded p-16"
-        onSubmit={formik.handleSubmit}
-      >
-        <p className="font-bold text-2xl">Login</p>
-        <div>
-          <input
-            type="text"
-            name="email"
-            placeholder="Email"
-            className="border-2 p-2 border-black rounded h-8 w-64"
-            value={formik.values.email}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          />
-          {formik.touched.email && formik.errors.email ? (
-            <div className="text-red-500 text-sm">{formik.errors.email}</div>
-          ) : null}
+      <div className="flex flex-col md:flex-row-reverse h-auto items-center justify-around  w-full ">
+        <div className="mockup hidden lg:block -mt-20">
+          <Mockup />
         </div>
-        <div>
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            className="border-2 p-2 border-black rounded h-8 w-64"
-            value={formik.values.password}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          />
-          {formik.touched.password && formik.errors.password ? (
-            <div className="text-red-500 text-sm">{formik.errors.password}</div>
-          ) : null}
+        <div className="bg-white p-8  rounded-md w-full max-w-sm py-24 shadow-xl shadow-[#04143A]">
+          <form onSubmit={formik.handleSubmit}>
+            <h1 className="text-4xl font-semibold mb-10">Login Now</h1>
+
+            <div className="mb-4">
+              <input
+                type="text"
+                name="email"
+                placeholder="Email"
+                className="border-2 border-gray-300 rounded w-full h-10 px-3"
+                value={formik.values.email}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+              {formik.touched.email && formik.errors.email ? (
+                <div className="text-red-500 text-sm">
+                  {formik.errors.email}
+                </div>
+              ) : null}
+            </div>
+            <div className="mb-4">
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                className="border-2 border-gray-300 rounded w-full h-10 px-3"
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+              {formik.touched.password && formik.errors.password ? (
+                <div className="text-red-500 text-sm">
+                  {formik.errors.password}
+                </div>
+              ) : null}
+            </div>
+            <button
+              type="submit"
+              className="bg-[#04143A] text-white px-4 py-2 rounded w-full"
+            >
+              Login
+            </button>
+            <p className="mt-4 text-center">
+              You haven't account?{" "}
+              <Link className="text-blue-500 underline" href={"/"}>
+                SignUp
+              </Link>
+            </p>
+          </form>
         </div>
-        <button
-          type="submit"
-          className="bg-black text-white px-4 py-2 rounded-md"
-        >
-          Submit
-        </button>
-        <p>
-          You haven't account?{" "}
-          <Link className="text-blue-500 underline" href={"/"}>
-            SignUp
-          </Link>
-        </p>
-      </form>
+      </div>
     </div>
   );
 };
