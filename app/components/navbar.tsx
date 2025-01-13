@@ -8,9 +8,7 @@ import Logo from "./logo";
 import Notification from "./notification";
 
 const Navbar = () => {
-  //   const [existUser, setExistUser] = useState(false); // Local state to store cookie value
-  // const {existUser,setExistUser} = useUserContext()
-  const router = useRouter();
+  const router: any = useRouter();
   const { user, setUser, existUser, setExistUser }: any = useUserContext();
   const [notification, setNotification] = useState({
     isShow: false,
@@ -18,17 +16,23 @@ const Navbar = () => {
     success: false,
   });
 
-  // Read the cookie value on the client side
   useEffect(() => {
     const userId = Cookies.get("userId");
-    setExistUser(!!userId); // Set to true if userId exists
-  }, []);
+    if (userId) {
+      setExistUser(true);
+    } else {
+      setExistUser(false);
+    }
+    if (userId && router.pathname === "/login") {
+      router.push(`/dashboard/${userId}`);
+    }
+  }, [router, setExistUser]);
 
   const LogoutUser = () => {
     try {
-      setUser(""); // Clear user from context
-      Cookies.remove("userId"); // Clear cookie
-      setExistUser(false); // Update local state
+      setExistUser(false);
+      setUser("");
+      Cookies.remove("userId", { path: "/" });
       setNotification({
         isShow: true,
         content: "Logout successfully!",
@@ -40,10 +44,9 @@ const Navbar = () => {
     } catch (err: any) {
       setNotification({
         isShow: true,
-        content: "Logout failed try Agian!",
+        content: "Logout failed! Try Again.",
         success: false,
       });
-      ``;
     }
   };
   useEffect(() => {

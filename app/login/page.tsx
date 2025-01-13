@@ -59,7 +59,7 @@ const Login = () => {
         } else {
           setNotification({
             isShow: true,
-            content: "something went wrongg",
+            content: "Invalid credential ",
             success: false,
           });
         }

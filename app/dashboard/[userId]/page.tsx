@@ -16,29 +16,6 @@ const UserDashboard = () => {
   const [searchInput, setSearchInput] = useState("");
   const [searchResult, setSearchResult] = useState([]);
 
-  // Fetch user's friends on component mount
-  useEffect(() => {
-    const getUserData = async () => {
-      setIsLoading(true);
-      const token = user?.data?.data?.token || Cookies.get("userId");
-      try {
-        const response = await axios.get(`${baseUrl}/api/user/get`, {
-          headers: { Authorization: `Bearer ${token}` },
-          withCredentials: true,
-        });
-
-        if (response.status === 200) {
-          setUser(response);
-          setIsLoading(false);
-        }
-      } catch (error) {
-        console.error("Error fetching user data in middleware:", error);
-      }
-    };
-    getUserData();
-  }, []);
-
-  // Handle user search
   const searchUsers = async () => {
     try {
       setIsLoading(true);
@@ -58,7 +35,6 @@ const UserDashboard = () => {
         senderId: userId,
         receiverId: receiverId,
       });
-      console.log("Request sent:", response.data);
     } catch (error) {
       console.log("Error sending friend request:", error);
     }
@@ -72,7 +48,9 @@ const UserDashboard = () => {
         {isLoading ? (
           <Skeleton count={10} />
         ) : (
-          <h1>Welcome {user?.data?.data?.username || user?.data?.username}</h1>
+          <h1>
+            Welcome {user?.data?.data?.user?.username || user?.data?.username}
+          </h1>
         )}
         <div className="flex">
           <input

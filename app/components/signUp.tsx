@@ -62,7 +62,6 @@ const SignUp = () => {
           content: err.response?.data?.error || "Failed to create account",
           success: false,
         });
-        console.log(err.response?.data?.error || "Failed to create account");
       }
     },
   });

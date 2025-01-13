@@ -56,16 +56,19 @@ const RequestsPage = () => {
         <FaArrowLeft />
       </button>
       <h1>
-        Your Requests dear <b>{user?.data?.data.username}</b>
+        Your Requests dear <b>{user?.data?.username}</b>
       </h1>
       {requests.length > 0 ? (
         <ul>
           {requests.map((request: any) => (
-            <li className="text-red-500 flex justify-between" key={request._id}>
-              {request.username}
+            <li
+              className="text-red-500 flex justify-between"
+              key={request?._id}
+            >
+              {request?.username}
               <button
                 className="bg-white border-black text-black rounded p-3 "
-                onClick={() => acceptRequest(request._id)}
+                onClick={() => acceptRequest(request?._id)}
               >
                 Accept
               </button>
